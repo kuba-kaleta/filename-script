@@ -1,11 +1,39 @@
-# Write-Host "Congratulations! Your first script executed successfully"
+# Change names of all photos in a folder to earliest aviable date
 
 $FOlder = 'C:\Users\kubam\Desktop\New'
 $CharWhiteList = '[^: \w\/]'
 $Shell = New-Object -ComObject shell.application
-$i = 1
-Get-ChildItem $FOlder *.jpg -Recurse  | ForEach-Object{
-    $dir = $Shell.Namespace($_.DirectoryName)
-    $DateTaken = [datetime]::ParseExact(($dir.GetDetailsOf($dir.ParseName($_.Name),12) -replace $CharWhiteList),"yyyyMMdd HH:mm",$Null)
-    Rename-Item $_.FullName ('{0:yyyy_MM_dd}_Nr{1:0000}.jpg' -f $DateTaken, $i++)
+for (($j = 0), ($j = 0); $j -lt 2; $j++){
+    $i = 1
+    Get-ChildItem $FOlder *.jpg -Recurse  | ForEach-Object{
+        $dir = $Shell.Namespace($_.DirectoryName)
+        $strModified = $dir.GetDetailsOf($dir.ParseName($_.Name),3)
+        $strCreated = $dir.GetDetailsOf($dir.ParseName($_.Name),4)
+        $strAccessed = $dir.GetDetailsOf($dir.ParseName($_.Name),5)
+        $strTaken = $dir.GetDetailsOf($dir.ParseName($_.Name),12)
+
+        $list = New-Object Collections.Generic.List[datetime]
+
+        if ($strModified) {
+            $DateModified = [datetime]::ParseExact(($strModified -replace $CharWhiteList),"yyyyMMdd HH:mm",$Null)
+            $list.Add($DateModified)
+        }
+        if ($strCreated) {
+            $DateCreated = [datetime]::ParseExact(($strCreated -replace $CharWhiteList),"yyyyMMdd HH:mm",$Null)
+            $list.Add($DateCreated)
+        }
+        if ($strAccessed) {
+            $DateAccessed = [datetime]::ParseExact(($strAccessed -replace $CharWhiteList),"yyyyMMdd HH:mm",$Null)
+            $list.Add($DateAccessed)
+        }
+        if ($strTaken) {
+            $DateTaken = [datetime]::ParseExact(($strTaken -replace $CharWhiteList),"yyyyMMdd HH:mm",$Null)
+            $list.Add($DateTaken)
+        }
+
+        $list_sort = $list | Sort-Object
+
+        $EarliestDate = $list_sort[0]
+        Rename-Item $_.FullName ('{0:yyyy_MM_dd}_{1:0000}.jpg' -f $EarliestDate, $i++)
+    }
 }
