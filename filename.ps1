@@ -1,11 +1,11 @@
 # Change names of all photos in a folder to earliest aviable date
 
-$FOlder = 'C:\Users\kubam\Desktop\New'
+$FOlder = 'C:\Kuba\local\zdjecia_local\timeline\2021\2021'
 $CharWhiteList = '[^: \w\/]'
 $Shell = New-Object -ComObject shell.application
-for (($j = 0), ($j = 0); $j -lt 2; $j++){
+# for (($j = 0), ($j = 0); $j -lt 2; $j++){
     $i = 1
-    Get-ChildItem $FOlder *.jpg -Recurse  | ForEach-Object{
+    Get-ChildItem $FOlder *.jp* -Recurse  | ForEach-Object{
         $dir = $Shell.Namespace($_.DirectoryName)
         $strModified = $dir.GetDetailsOf($dir.ParseName($_.Name),3)
         $strCreated = $dir.GetDetailsOf($dir.ParseName($_.Name),4)
@@ -36,4 +36,4 @@ for (($j = 0), ($j = 0); $j -lt 2; $j++){
         $EarliestDate = $list_sort[0]
         Rename-Item $_.FullName ('{0:yyyy_MM_dd}_{1:0000}.jpg' -f $EarliestDate, $i++)
     }
-}
+# }
