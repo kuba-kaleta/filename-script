@@ -34,12 +34,13 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
     }
 
     $size = $_.Length
-    If     ($size -gt 1TB) {$size_format = [string]::Format("{0:0.00} TB", $size / 1TB)}
-    ElseIf ($size -gt 1GB) {$size_format = [string]::Format("{0:0.00} GB", $size / 1GB)}
-    ElseIf ($size -gt 1MB) {$size_format = [string]::Format("{0:0.00} MB", $size / 1MB)}
-    ElseIf ($size -gt 1KB) {$size_format = [string]::Format("{0:0.00} kB", $size / 1KB)}
-    ElseIf ($size -gt 0)   {$size_format = [string]::Format("{0:0.00} B", $size)}
+    If     ($size -gt 1TB) {$size_format = [string]::Format("{0:0.00}TB", $size / 1TB)}
+    ElseIf ($size -gt 1GB) {$size_format = [string]::Format("{0:0.00}GB", $size / 1GB)}
+    ElseIf ($size -gt 1MB) {$size_format = [string]::Format("{0:0.00}MB", $size / 1MB)}
+    ElseIf ($size -gt 1KB) {$size_format = [string]::Format("{0:0.00}KB", $size / 1KB)}
+    ElseIf ($size -gt 0)   {$size_format = [string]::Format("{0:0.00}B", $size)}
     Else                   {$size_format = ""}
+    # $size_format = $size_format.replace('.','-')
 
     $list_sort = $list | Sort-Object
     $list_dupl = Get-ChildItem $_.DirectoryName | where {$_.extension -in $types}
@@ -67,7 +68,7 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
     $short = $true
     foreach ($item in $list_dupl_w){
         if($item.Length -ge 16){
-            if($item.Substring(0, 16) -eq $short_name.Substring(0, 16)){
+            if($item.Substring(0, 20) -eq $short_name.Substring(0, 20)){
                 # Write-Host "false" $item
                 $short = $false
             }
@@ -78,7 +79,7 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
         $global:dupl = $true
         while($dupl){
             $dupl = $false
-            $long_name = "{0:yyyy_MM_dd_HH}h{1:mm}_{2:00000}$ext" -f $EarliestDate, $EarliestDate, $i++
+            $long_name = "{0:yyyy_MM_dd_HH}h{1:mm}_$size_format{2:_00000}$ext" -f $EarliestDate, $EarliestDate, $i++
             foreach ($item in $list_dupl_w){
                 if($long_name -eq $item){
                     # Write-Host "dupl"
@@ -89,10 +90,10 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
     }
 
     if($short){
-        Write-Host $short_name "      short"
+        Write-Host $short_name
         Rename-Item $_.FullName ($short_name)
     }else{
-        Write-Host $long_name "long"
+        Write-Host $long_name
         Rename-Item $_.FullName ($long_name)
     }
 }
