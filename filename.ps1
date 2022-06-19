@@ -5,6 +5,12 @@ $types = ('.jpg', '.jpeg', '.heic')
 $CharWhiteList = '[^: \w\/]'
 $Shell = New-Object -ComObject shell.application
 
+$raport_folder_name = $FOlder.Replace("\", "_").Replace(":", "_")
+$curr_date = Get-Date -Format "_MM_dd_yyyy_HH_mm_ss"
+$raport_folder = 'C:\Kuba\local\projekty_local\kody\filename-test\raports'
+$raport_path = $raport_folder + "\" + "$raport_folder_name$curr_date.txt"
+New-Item -Path $raport_folder -Name "$raport_folder_name$curr_date.txt" -ItemType File
+
 $i = 1
 Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Object{ # -Recurse
     $dir = $Shell.Namespace($_.DirectoryName)
@@ -78,7 +84,7 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
             $list_dupl_w.Add($item)
             if($item.Name.Length -gt 22){
                 if($item.Name.Substring(0, 22) -eq $short_name.Substring(0, 22)){
-                    Write-Host "sub" $item.Name.Substring(0, 22)
+                    # Write-Host "sub" $item.Name.Substring(0, 22)
                     $short = $false
                 }
             } 
@@ -102,8 +108,10 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
     if($short){
         Write-Host $short_name
         Rename-Item $_.FullName ($short_name)
+        $_.FullName + " --> " + $short_name | Out-File -FilePath $raport_path -Append -Force
     }else{
         Write-Host $long_name
         Rename-Item $_.FullName ($long_name)
+        $_.FullName + " --> " + $long_name | Out-File -FilePath $raport_path -Append -Force
     }
 }
