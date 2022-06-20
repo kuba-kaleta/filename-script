@@ -1,7 +1,7 @@
 # Change names of all photos in a folder to earliest aviable date
 
 $FOlder = 'C:\Kuba\local\projekty_local\kody\filename-test'
-$types = ('.jpg', '.jpeg', '.heic')
+$types = ('.jpg', '.jpeg', '.heic', '.png')
 $CharWhiteList = '[^: \w\/]'
 $Shell = New-Object -ComObject shell.application
 
@@ -36,7 +36,7 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
         $taken = ""
         if($strCreated){
             if($DateCreated -lt $DateTaken){
-                $taken = "_nc" # nieprawidlowy date taken
+                $taken = "_ntc" # nieprawidlowy date taken
             }
         }
     }
@@ -82,9 +82,10 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
         if($item.Name -ne $_.Name){ # Substring(0, 16)
             # Write-Host $item.Name
             $list_dupl_w.Add($item)
-            if($item.Name.Length -gt 22){
-                if($item.Name.Substring(0, 22) -eq $short_name.Substring(0, 22)){
-                    # Write-Host "sub" $item.Name.Substring(0, 22)
+            $short_length = $short_name.Length
+            if($item.Name.Length -ge $short_length){
+                if($item.Name.Substring(0, $short_length - $ext.Length) -eq $short_name.Substring(0, $short_length - $ext.Length)){
+                    Write-Host "sub" $item.Name.Substring(0, $short_length - $ext.Length) $ext.Length
                     $short = $false
                 }
             } 
