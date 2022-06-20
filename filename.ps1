@@ -1,15 +1,15 @@
 # Change names of all photos in a folder to earliest aviable date
 
-$FOlder = 'C:\Kuba\local\projekty_local\kody\filename-test'
+$FOlder = 'C:\Kuba\local\zdjecia_local\timeline\2021\2021'
 $types = ('.jpg', '.jpeg', '.heic', '.png')
 $CharWhiteList = '[^: \w\/]'
 $Shell = New-Object -ComObject shell.application
 
-$raport_folder_name = $FOlder.Replace("\", "_").Replace(":", "_")
-$curr_date = Get-Date -Format "_MM_dd_yyyy_HH_mm_ss"
+$raport_folder_name = $FOlder.Replace("\", "_").Replace(":", "")
+$curr_date = Get-Date -Format "MM_dd_yyyy_HH_mm_ss_"
 $raport_folder = 'C:\Kuba\local\projekty_local\kody\filename-test\raports'
 $raport_path = $raport_folder + "\" + "$raport_folder_name$curr_date.txt"
-New-Item -Path $raport_folder -Name "$raport_folder_name$curr_date.txt" -ItemType File
+New-Item -Path $raport_folder -Name "$curr_date$raport_folder_name.txt" -ItemType File
 
 $i = 1
 Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Object{ # -Recurse
