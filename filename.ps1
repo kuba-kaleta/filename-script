@@ -1,6 +1,6 @@
 # Change names of all photos in a folder to earliest aviable date
 
-$FOlder = 'C:\Kuba\local\zdjecia_local\timeline\2021\2021'
+$FOlder = 'C:\Kuba\local\projekty_local\kody\filename-test'
 $types = ('.jpg', '.jpeg', '.heic', '.png')
 $CharWhiteList = '[^: \w\/]'
 $Shell = New-Object -ComObject shell.application
@@ -61,34 +61,18 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
     $list_dupl = Get-ChildItem $_.DirectoryName | where {$_.extension -in $types}
     $earliestDate = $list_sort[0]
     $ext = $_.extension.ToLower()
-    $short_name = "{0:yyyy_MM_dd_HH}h{1:mm_}$size_format$taken$ext" -f $earliestDate, $EarliestDate
-
-    # $comm = $dir.GetDetailsOf($dir.ParseName($_.Name), 24)
-    # if($comm.Length -ge 1001){
-    #     $comm = $comm.Substring(0, 999)
-    # }
-    # $dir.SetDetailsOf($dir.ParseName($_.Name), 24, "$comm ... $_.Name")
-    # Write-Host $_.Name $short_name
-
-    # foreach ($item in $list_dupl){
-    #     if($item.Name -ne $_.Name){ # Substring(0, 16)
-    #         # Write-Host $item.Name
-    #         $list_dupl_w.Add($item)
-    #     }
-    # }
+    $short_name = "{0:yyyy_MM_dd_HH}h{1:mm_}$size_format$taken" -f $earliestDate, $EarliestDate
+    $short_name_e = $short_name + $ext
 
     $short = $true
     foreach ($item in $list_dupl){
         if($item.Name -ne $_.Name){ # Substring(0, 16)
             # Write-Host $item.Name
-            $list_dupl_w.Add($item)
-            $short_length = $short_name.Length
-            if($item.Name.Length -ge $short_length){
-                if($item.Name.Substring(0, $short_length - $ext.Length) -eq $short_name.Substring(0, $short_length - $ext.Length)){
-                    Write-Host "sub" $item.Name.Substring(0, $short_length - $ext.Length) $ext.Length
-                    $short = $false
-                }
-            } 
+            $list_dupl_w.Add($item) 
+            if($item.Name -eq $short_name_e){
+                Write-Host "sub" $item.Name
+                $short = $false
+            }
         }       
     }
 
@@ -96,7 +80,7 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
         $global:dupl = $true
         while($dupl){
             $dupl = $false
-            $long_name = "{0:yyyy_MM_dd_HH}h{1:mm_}$size_format$taken{2:_00000}$ext" -f $EarliestDate, $EarliestDate, $i++
+            $long_name = "$short_name{0:_00000}$ext" -f $i++
             foreach ($item in $list_dupl_w){
                 if($long_name -eq $item){
                     # Write-Host "dupl"
@@ -107,9 +91,9 @@ Get-ChildItem $FOlder -Recurse | where {$_.extension -in $types} | ForEach-Objec
     }
 
     if($short){
-        Write-Host $short_name
-        Rename-Item $_.FullName ($short_name)
-        $_.FullName + " --> " + $short_name | Out-File -FilePath $raport_path -Append -Force
+        Write-Host $short_name_e
+        Rename-Item $_.FullName ($short_name_e)
+        $_.FullName + " --> " + $short_name_e | Out-File -FilePath $raport_path -Append -Force
     }else{
         Write-Host $long_name
         Rename-Item $_.FullName ($long_name)
